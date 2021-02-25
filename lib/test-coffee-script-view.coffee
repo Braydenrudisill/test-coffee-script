@@ -34,7 +34,7 @@ class TestCoffeeScriptView extends View
 
     @content: ->
         @div =>
-            @h1 "The test-coffee-script package is Alive! It's ALIVE!"
+            @h1 "Bezier Curve Editor"
             @h1     id: "startBut",
                     mouseDown: "Start",
                     "Start"
@@ -134,7 +134,7 @@ class TestCoffeeScriptView extends View
 
             return Math.sqrt xd*xd+yd*yd
 
-    class curve
+    class curve_c
         constructor: () ->
             @isValid = false
             @p1 = new curvePoint
@@ -161,7 +161,7 @@ class TestCoffeeScriptView extends View
 
     addCurve: () =>
         curveParams = "100,250,150,100,350,100,400,250"
-        @tCurve = new curve
+        @tCurve = new curve_c
         @tCurve.set(curveParams)
 
         if @tCurve.isValid
@@ -170,37 +170,40 @@ class TestCoffeeScriptView extends View
 
     recPoints: () =>
         atom.workspace.open().then (editor) =>
-            editor.insertText "#include <vector>\n"
+            editor.insertText "#include <vector>\n\nusing namespace std;\n\n"
+            editor.insertText "vector<vector<vector<double>>> curve_list = {\n"
+            origin = {x: @curves[0].p1.x, y: @curves[0].p1.y}
+
             for curve in @curves
                 # Record control points
                 for point of curve
                     p = curve[point]
                     if p.x?
-                        editor.insertText "// "+p.x
+                        editor.insertText "// "+ (p.x-origin.x)
                         editor.insertText ","
-                        editor.insertText ""+p.y
+                        editor.insertText ""+ -1*(p.y-origin.y)
                         editor.insertText "\n"
                 console.log curve.p1.x
-                editor.insertText "\n"
 
                 # Record points on curve
                 num_points = 200
                 accuracy = 1/num_points
                 count = 0
-                editor.insertText "vector< vector<double> > point_list = {\n"
+                editor.insertText "\t{\n"
                 while count <= 1
-                    p0 = {x: curve.p1.x, y: curve.p1.y}
-                    p3 = {x: curve.p2.x, y: curve.p2.y}
-                    p1 = {x: curve.cp1.x, y: curve.cp1.y}
-                    p2 = {x: curve.cp2.x, y: curve.cp2.y}
+                    p0 = {x: curve.p1.x-origin.x, y: curve.p1.y-origin.y}
+                    p3 = {x: curve.p2.x-origin.x, y: curve.p2.y-origin.y}
+                    p1 = {x: curve.cp1.x-origin.x, y: curve.cp1.y-origin.y}
+                    p2 = {x: curve.cp2.x-origin.x, y: curve.cp2.y-origin.y}
 
                     p = bezier(count, p0,p1,p2,p3)
-                    editor.insertText "\t{"+p.x
+                    editor.insertText "\t\t{"+p.x
                     editor.insertText ","
-                    editor.insertText ""+p.y+"},\n"
+                    editor.insertText ""+(-1*p.y)+"},\n"
                     count+=accuracy
 
-                editor.insertText "};"
+                editor.insertText "\t},\n\n"
+            editor.insertText "};"
 
 
 

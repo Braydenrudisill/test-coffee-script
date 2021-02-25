@@ -15,5 +15,12 @@
   "dependencies": {
     "atom-space-pen-views": "^2.0.3",
     "sub-atom": "1.0.x"
+  },
+  "consumedServices": {
+    "tool-bar": {
+      "versions": {
+        "^0 || ^1": "consumeToolBar"
+      }
+    }
   }
 }
