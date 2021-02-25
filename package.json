@@ -1,14 +1,14 @@
 {
   "name": "test-coffee-script",
   "main": "./lib/main",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "description": "A bezier curve editor for vex robotics",
   "keywords": [
   ],
   "activationCommands": {
     "atom-workspace": "test-coffee-script:open"
   },
-  "repository": "https://github.com/Braydenrudisill/test-coffee-script/",
+  "repository": "https://github.com/Braydenrudisill/test-coffee-script",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
