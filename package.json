@@ -2,7 +2,7 @@
   "name": "test-coffee-script",
   "main": "./lib/main",
   "version": "0.0.0",
-  "description": "A short description of your package",
+  "description": "A bezier curve editor for vex robotics",
   "keywords": [
   ],
   "activationCommands": {

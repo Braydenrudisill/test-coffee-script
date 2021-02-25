@@ -40,6 +40,8 @@ class TestCoffeeScriptView extends View
                     "Start"
             @button id: "addCurveBut",
                     "Add Curve"
+            @button id: "recPointsBut",
+                    "Record Points"
             @canvas true, #for some reason you can't split onto multiple lines without this
                     width: 500,
                     height: 500,
@@ -52,42 +54,42 @@ class TestCoffeeScriptView extends View
         if not @mouseDown
             return
 
-        c = element.context
-        ctx = c.getContext('2d')
-
-        num_points = 200
-        accuracy = 1/num_points
-        p0 = {x: 100, y: 500}
-        p1 = {x: 50, y: 100}
-        p2 = {x: 150, y: 200}
-        p3 = {x: event.offsetX, y: event.offsetY}
-
-
-        ctx.moveTo(p0.x,p0.y)
-        ctx.strokeStyle = "#FFFFFF"
-        ctx.clearRect(0, 0, c.width, c.height);
-
-        count = 0
-        ctx.beginPath()
-        while count <= 1
-            p = bezier(count, p0, p1, p2, p3)
-            ctx.lineTo(p.x, p.y)
-            ctx.stroke()
-            count+=accuracy
-
-        ctx.beginPath()
-        ctx.moveTo(p0.x,p0.y)
-        ctx.arc(p0.x, p0.y, 5, 0, 2 * Math.PI, false)
-        ctx.stroke()
-        ctx.moveTo(p1.x,p1.y)
-        ctx.arc(p1.x, p1.y, 5, 0, 2 * Math.PI, false)
-        ctx.stroke()
-        ctx.moveTo(p2.x,p2.y)
-        ctx.arc(p2.x, p2.y, 5, 0, 2 * Math.PI, false)
-        ctx.stroke()
-        ctx.moveTo(p3.x,p3.y)
-        ctx.arc(p3.x, p3.y, 5, 0, 2 * Math.PI, false)
-        ctx.stroke()
+        # c = element.context
+        # ctx = c.getContext('2d')
+        #
+        # num_points = 200
+        # accuracy = 1/num_points
+        # p0 = {x: 100, y: 500}
+        # p1 = {x: 50, y: 100}
+        # p2 = {x: 150, y: 200}
+        # p3 = {x: event.offsetX, y: event.offsetY}
+        #
+        #
+        # ctx.moveTo(p0.x,p0.y)
+        # ctx.strokeStyle = "#FFFFFF"
+        # ctx.clearRect(0, 0, c.width, c.height);
+        #
+        # count = 0
+        # ctx.beginPath()
+        # while count <= 1
+        #     p = bezier(count, p0, p1, p2, p3)
+        #     ctx.lineTo(p.x, p.y)
+        #     ctx.stroke()
+        #     count+=accuracy
+        #
+        # ctx.beginPath()
+        # ctx.moveTo(p0.x,p0.y)
+        # ctx.arc(p0.x, p0.y, 5, 0, 2 * Math.PI, false)
+        # ctx.stroke()
+        # ctx.moveTo(p1.x,p1.y)
+        # ctx.arc(p1.x, p1.y, 5, 0, 2 * Math.PI, false)
+        # ctx.stroke()
+        # ctx.moveTo(p2.x,p2.y)
+        # ctx.arc(p2.x, p2.y, 5, 0, 2 * Math.PI, false)
+        # ctx.stroke()
+        # ctx.moveTo(p3.x,p3.y)
+        # ctx.arc(p3.x, p3.y, 5, 0, 2 * Math.PI, false)
+        # ctx.stroke()
 
     handleClickDown: (event, element) ->
         # console.log "mouseDown"
@@ -165,6 +167,45 @@ class TestCoffeeScriptView extends View
         if @tCurve.isValid
             @curves.push(@tCurve)
         @DrawCanvas()
+
+    recPoints: () =>
+        atom.workspace.open().then (editor) =>
+            editor.insertText "#include <vector>\n"
+            for curve in @curves
+                # Record control points
+                for point of curve
+                    p = curve[point]
+                    if p.x?
+                        editor.insertText "// "+p.x
+                        editor.insertText ","
+                        editor.insertText ""+p.y
+                        editor.insertText "\n"
+                console.log curve.p1.x
+                editor.insertText "\n"
+
+                # Record points on curve
+                num_points = 200
+                accuracy = 1/num_points
+                count = 0
+                editor.insertText "vector< vector<double> > point_list = {\n"
+                while count <= 1
+                    p0 = {x: curve.p1.x, y: curve.p1.y}
+                    p3 = {x: curve.p2.x, y: curve.p2.y}
+                    p1 = {x: curve.cp1.x, y: curve.cp1.y}
+                    p2 = {x: curve.cp2.x, y: curve.cp2.y}
+
+                    p = bezier(count, p0,p1,p2,p3)
+                    editor.insertText "\t{"+p.x
+                    editor.insertText ","
+                    editor.insertText ""+p.y+"},\n"
+                    count+=accuracy
+
+                editor.insertText "};"
+
+
+
+
+
 
 
     delCurve: () ->
@@ -510,6 +551,7 @@ class TestCoffeeScriptView extends View
         @current = 0
 
         document.getElementById("addCurveBut").addEventListener("click", @addCurve, false)
+        document.getElementById("recPointsBut").addEventListener("click", @recPoints, false)
 
         if (@canvas.getContext)
             @ctx = @canvas.getContext("2d")
