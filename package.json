@@ -8,7 +8,7 @@
   "activationCommands": {
     "atom-workspace": "test-coffee-script:open"
   },
-  "repository": "https://github.com/Braydenrudisill/test-coffee-script.git/",
+  "repository": "https://github.com/Braydenrudisill/test-coffee-script/",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
